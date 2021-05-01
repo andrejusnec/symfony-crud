@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+{% block title %}User list {% endblock %}
+{% block body %} 
+<h1>Users</h1>
+{% if users %}
+<table id="users" class="table table-striped">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td>{{ user }}</td>
+            <td> <a href="/user/1" class="btn btn-dark">Show</a>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% else %}
+<p>No Users</p>
+{% endif %}
+{% endblock %}
