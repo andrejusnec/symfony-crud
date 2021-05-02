@@ -3,6 +3,10 @@
 {% block body %} 
 {% if group %}
 <h3> {{group.title}} </h3>
+{% for li in list %}
+    <span> {{li.user}}
+{% endfor %}
+<br>
 {% else %}
 <p>Loooks like an error and you didnt passed any groups</p>
 {% endif %}

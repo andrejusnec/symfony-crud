@@ -8,9 +8,12 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
+use App\Entity\UserGroup;
+use App\Entity\Group;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 
 class UserController extends AbstractController {
     /**
@@ -30,8 +33,11 @@ class UserController extends AbstractController {
     public function newUser(Request $request) {
 
       $user = new User();
+      $groups = $this->getDoctrine()->getRepository(Group::Class)->findAll();
+
       $form = $this->createFormBuilder($user) 
       ->add('name', TextType::class, ['attr' =>['class' => 'form-control']])
+      ->add('password', PasswordType::class, ['attr' =>['class' => 'form-control']])
       ->add('save', SubmitType::class, ['label' => 'Create', 'attr' =>['class' => 'btn btn-primary mt-3']])
       ->getForm();
       $form->handleRequest($request);
@@ -46,7 +52,7 @@ class UserController extends AbstractController {
 
         return $this->redirectToRoute('user_list');
       }
-      return $this->render('users/create.html.twig', ['form' => $form->createView()]);
+      return $this->render('users/create.html.twig', ['form' => $form->createView(), 'groups' => $groups]);
     }
 
     /**
@@ -77,7 +83,8 @@ class UserController extends AbstractController {
      */
     public function show($id) {
       $user = $this->getDoctrine()->getRepository(User::Class)->find($id);
-        return $this->render('users/show.html.twig',['user' => $user]);
+      $groupList = $this->getDoctrine()->getRepository(UserGroup::Class)->findBy(['user' => $user]);
+        return $this->render('users/show.html.twig',['user' => $user, 'list' => $groupList]);
       }
 
     /**

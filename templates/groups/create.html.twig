@@ -4,6 +4,11 @@
 {{ form_start(form) }}
 
 {{ form_widget(form) }}
-
+<select class="form-control" name="group_id">
+  <option>Select group</option>
+  {% for user in users %}
+  <option value="{{ user.id }}">{{user.name}}</option>
+  {% endfor %}
+   </select>
 {{ form_end(form) }}
 {% endblock %}

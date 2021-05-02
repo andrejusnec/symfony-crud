@@ -4,7 +4,12 @@
 {{ form_start(form) }}
 
 {{ form_widget(form) }}
-
+<select class="form-control" name="group_id">
+  <option>Select group</option>
+  {% for group in groups %}
+  <option value="{{ group.id }}">{{group.title}}</option>
+  {% endfor %}
+   </select>
 {{ form_end(form) }}
 {# <a href="/" class="btn btn-primary">Back</a> #}
 {% endblock %}

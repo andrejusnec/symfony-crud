@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Group;
+use App\Entity\User;
+use App\Entity\UserGroup;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -33,6 +35,8 @@ class GroupController extends AbstractController
     public function newGroup(Request $request) {
 
         $group = new Group();
+        $users = $this->getDoctrine()->getRepository(User::Class)->findAll();
+
         $form = $this->createFormBuilder($group) 
         ->add('title', TextType::class, ['attr' =>['class' => 'form-control']])
         ->add('save', SubmitType::class, ['label' => 'Create', 'attr' =>['class' => 'btn btn-primary mt-3']])
@@ -49,7 +53,7 @@ class GroupController extends AbstractController
   
           return $this->redirectToRoute('group_list');
         }
-        return $this->render('groups/create.html.twig', ['form' => $form->createView()]);
+        return $this->render('groups/create.html.twig', ['form' => $form->createView(), 'users' => $users]);
       }
   
       /**
@@ -57,6 +61,7 @@ class GroupController extends AbstractController
        * Method({"GET", "POST"})
        */
       public function edit(Request $request, $id) {
+
         $group = $this->getDoctrine()->getRepository(Group::Class)->find($id);
         $form = $this->createFormBuilder($group) 
         ->add('title', TextType::class, ['attr' =>['class' => 'form-control']])
@@ -80,7 +85,8 @@ class GroupController extends AbstractController
      */
     public function show($id) {
         $group = $this->getDoctrine()->getRepository(Group::Class)->find($id);
-          return $this->render('groups/show.html.twig',['group' => $group]);
+        $userList = $this->getDoctrine()->getRepository(UserGroup::Class)->findBy(['grupe' => $group]);
+          return $this->render('groups/show.html.twig',['group' => $group, 'list' => $userList]);
         }
   
       /**
