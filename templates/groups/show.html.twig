@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block title %}Group Information{% endblock %}
+{% block body %} 
+{% if group %}
+<h3> {{group.title}} </h3>
+{% else %}
+<p>Loooks like an error and you didnt passed any groups</p>
+{% endif %}
+<a href="/groups/" class="btn btn-primary">Back</a>
+{% endblock %}

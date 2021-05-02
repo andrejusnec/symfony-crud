@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+{% block title %}Group list {% endblock %}
+{% block body %} 
+<h1>Groups</h1>
+{% if groups %}
+<table id="groups" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Group</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for group in groups %}
+          <tr>
+            <td>{{ group.title }}</td>
+            <td> 
+            <a href="/groups/group/{{ group.id }}" class="btn btn-dark">Show</a>
+            <a href="/groups/group/edit/{{ group.id }}" class="btn btn-dark">Edit</a>
+            <a href="/groups/group/delete/{{group.id}}" class="btn btn-danger">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% else %}
+<p>No Groups</p>
+{% endif %}
+{% endblock %}

@@ -14,7 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 
 class UserController extends AbstractController {
     /**
-     * @Route("/", name="user_list")
+     * @Route("/users", name="user_list")
      * @Method({"GET"})
      */
     public function index() {
@@ -24,7 +24,7 @@ class UserController extends AbstractController {
     }
     
     /**
-     * @Route("user/new", name="new_user")
+     * @Route("/users/user/new", name="new_user")
      * Method({"GET", "POST"})
      */
     public function newUser(Request $request) {
@@ -50,11 +50,10 @@ class UserController extends AbstractController {
     }
 
     /**
-     * @Route("user/edit/{id}", name="edit_user")
+     * @Route("/users/user/edit/{id}", name="edit_user")
      * Method({"GET", "POST"})
      */
     public function edit(Request $request, $id) {
-      //$user = new User();
       $user = $this->getDoctrine()->getRepository(User::Class)->find($id);
       $form = $this->createFormBuilder($user) 
       ->add('name', TextType::class, ['attr' =>['class' => 'form-control']])
@@ -74,7 +73,7 @@ class UserController extends AbstractController {
     }
 
     /**
-     * @Route("/user/{id}", name="show_user")
+     * @Route("/users/user/{id}", name="show_user")
      */
     public function show($id) {
       $user = $this->getDoctrine()->getRepository(User::Class)->find($id);
@@ -82,17 +81,17 @@ class UserController extends AbstractController {
       }
 
     /**
-     * @Route("/user/delete/{id}", name="delete_user")
+     * @Route("/users/user/delete/{id}", name="delete_user")
      * @Method({"DELETE"})
      */
     public function delete($id): Response{
       $user = $this->getDoctrine()->getRepository(User::Class)->find($id);
-
+      $name = $user->getName();
       $entityManager = $this->getDoctrine()->getManager();
       $entityManager->remove($user);
       $entityManager->flush();
 
-      $this->addFlash('success', 'User was succesfully deleted');
+      $this->addFlash('success', 'User '.$name.' was succesfully deleted');
 
         return $this->redirectToRoute('user_list');
   } 
