@@ -16,6 +16,11 @@
     </head>
     <body>
     {{include('inc/navbar.html.twig')}}
+    {% for message in app.flashes('success') %}
+        <div style="text-align:center" class="alert alert-success">
+        {{ message }}
+        </div>
+    {% endfor %}
     <div class="container">
         {% block body %}{% endblock %}
     </div>

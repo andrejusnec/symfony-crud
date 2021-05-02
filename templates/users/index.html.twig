@@ -13,8 +13,12 @@
       <tbody>
         {% for user in users %}
           <tr>
-            <td>{{ user }}</td>
-            <td> <a href="/user/1" class="btn btn-dark">Show</a>
+            <td>{{ user.name }}</td>
+            <td> 
+            <a href="/user/{{ user.id }}" class="btn btn-dark">Show</a>
+            <a href="/user/edit/{{ user.id }}" class="btn btn-dark">Edit</a>
+            <a href="/user/delete/{{user.id}}" class="btn btn-danger">Delete</a>
+            </td>
           </tr>
         {% endfor %}
       </tbody>

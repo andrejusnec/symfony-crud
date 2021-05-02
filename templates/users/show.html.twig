@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block title %}User Information{% endblock %}
+{% block body %} 
+{% if user %}
+<h3> {{user.name}} </h3>
+{% else %}
+<p>Loooks like an error and you didnt passed any users</p>
+{% endif %}
+<a href="/" class="btn btn-primary">Back</a>
+{% endblock %}
