@@ -44,8 +44,12 @@ class GroupController extends AbstractController
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()) {
           $data = $form->getData();
-  
           $entityManager = $this->getDoctrine()->getManager();
+          $user = $this->getDoctrine()->getRepository(User::Class)->find($request->request->get('user_id'));
+        if($user != null) {
+          $newLink = new userGroup($user, $group);
+          $entityManager->persist($newLink);
+        }
           $entityManager->persist($group);
           $entityManager->flush();
   
@@ -63,21 +67,27 @@ class GroupController extends AbstractController
       public function edit(Request $request, $id) {
 
         $group = $this->getDoctrine()->getRepository(Group::Class)->find($id);
+        $users = $this->getDoctrine()->getRepository(User::Class)->findAll();
+
         $form = $this->createFormBuilder($group) 
         ->add('title', TextType::class, ['attr' =>['class' => 'form-control']])
         ->add('save', SubmitType::class, ['label' => 'Edit', 'attr' =>['class' => 'btn btn-primary mt-3']])
         ->getForm();
         $form->handleRequest($request);
         if($form->isSubmitted() && $form->isValid()) {
-          //$data = $form->getData();
           $entityManager = $this->getDoctrine()->getManager();
+        $user = $this->getDoctrine()->getRepository(User::Class)->find($request->request->get('user_id'));
+        if($group != null) {
+          $newLink = new userGroup($user, $group);
+          $entityManager->persist($newLink);
+        }
           $entityManager->flush();
   
           $this->addFlash('success', 'Group was succesfully edited');
   
           return $this->redirectToRoute('group_list');
         }
-        return $this->render('groups/edit.html.twig', ['form' => $form->createView()]);
+        return $this->render('groups/edit.html.twig', ['form' => $form->createView(), 'users' => $users]);
       }
 
       /**
@@ -104,4 +114,19 @@ class GroupController extends AbstractController
   
           return $this->redirectToRoute('group_list');
     } 
+    /**
+     * @Route("/groups/group/deleteUser/{id}", name="deleteU")
+     * @Method({"DELETE"})
+     */
+    public function deleteUser($id): Response{
+      $userGroup = $this->getDoctrine()->getRepository(UserGroup::Class)->find($id);
+      $group = $userGroup->getGrupe()->getId();
+      $entityManager = $this->getDoctrine()->getManager();
+      $entityManager->remove($userGroup);
+      $entityManager->flush();
+
+      $this->addFlash('success', 'User was succesfully removed');
+
+        return $this->redirectToRoute('show_group', ['id' => $group]);
+  } 
 }

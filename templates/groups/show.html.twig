@@ -3,12 +3,29 @@
 {% block body %} 
 {% if group %}
 <h3> {{group.title}} </h3>
-{% for li in list %}
-    <span> {{li.user}}
-{% endfor %}
+
 <br>
+<table id="groups" class="table table-striped">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for li in list %}
+          <tr>
+            <td>{{li.user}}</td>
+            <td>
+            <a href="/users/user/{{ li.user.id }}" class="btn btn-dark">User Details</a>
+            <a href="/groups/group/deleteUser/{{li.id}}" class="btn btn-danger">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 {% else %}
-<p>Loooks like an error and you didnt passed any groups</p>
+<p>Something went wrong</p>
 {% endif %}
 <a href="/groups/" class="btn btn-primary">Back</a>
 {% endblock %}

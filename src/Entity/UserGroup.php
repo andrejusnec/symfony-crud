@@ -29,6 +29,11 @@ class UserGroup
      */
     private $grupe;
 
+    public function __construct(User $user, Group $group) {
+        $this->user = $user;
+        $this->grupe = $group;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

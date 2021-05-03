@@ -4,12 +4,28 @@
 {% if user %}
 <h3> {{user.name}} </h3>
 
-{% for li in list %}
-    <span> {{li.grupe}}
-{% endfor %}
 <br>
+<table id="users" class="table table-striped">
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for li in list %}
+          <tr>
+            <td>{{li.grupe}}</td>
+            <td>
+            <a href="/groups/group/{{ li.grupe.id }}" class="btn btn-dark">Group Details</a>
+            <a href="/users/user/deleteGroup/{{li.id}}" class="btn btn-danger">Delete</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
 {% else %}
-<p>Loooks like an error and you didnt passed any users</p>
+<p>Something went wrong</p>
 {% endif %}
 <a href="/users/" class="btn btn-primary">Back</a>
 {% endblock %}

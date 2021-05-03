@@ -14,8 +14,17 @@ use App\Entity\Group;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class UserController extends AbstractController {
+    /**
+     * @Route("/", name="main")
+     * @Method({"GET"})
+     */
+    public function main() {
+
+      return $this->render('main.html.twig');
+    }
     /**
      * @Route("/users", name="user_list")
      * @Method({"GET"})
@@ -43,8 +52,12 @@ class UserController extends AbstractController {
       $form->handleRequest($request);
       if($form->isSubmitted() && $form->isValid()) {
         $data = $form->getData();
-
         $entityManager = $this->getDoctrine()->getManager();
+        $group = $this->getDoctrine()->getRepository(Group::Class)->find($request->request->get('group_id'));
+        if($group != null) {
+          $newLink = new userGroup($user, $group);
+          $entityManager->persist($newLink);
+        }
         $entityManager->persist($user);
         $entityManager->flush();
 
@@ -60,22 +73,31 @@ class UserController extends AbstractController {
      * Method({"GET", "POST"})
      */
     public function edit(Request $request, $id) {
+
       $user = $this->getDoctrine()->getRepository(User::Class)->find($id);
+      $groups = $this->getDoctrine()->getRepository(Group::Class)->findAll();
+
       $form = $this->createFormBuilder($user) 
       ->add('name', TextType::class, ['attr' =>['class' => 'form-control']])
+      ->add('password', PasswordType::class, ['attr' =>['class' => 'form-control']])
       ->add('save', SubmitType::class, ['label' => 'Edit', 'attr' =>['class' => 'btn btn-primary mt-3']])
       ->getForm();
       $form->handleRequest($request);
       if($form->isSubmitted() && $form->isValid()) {
         //$data = $form->getData();
         $entityManager = $this->getDoctrine()->getManager();
+        $group = $this->getDoctrine()->getRepository(Group::Class)->find($request->request->get('group_id'));
+        if($group != null) {
+          $newLink = new userGroup($user, $group);
+          $entityManager->persist($newLink);
+        }
         $entityManager->flush();
 
         $this->addFlash('success', 'User was succesfully edited');
 
         return $this->redirectToRoute('user_list');
       }
-      return $this->render('users/edit.html.twig', ['form' => $form->createView()]);
+      return $this->render('users/edit.html.twig', ['form' => $form->createView(), 'groups' => $groups]);
     }
 
     /**
@@ -101,7 +123,24 @@ class UserController extends AbstractController {
       $this->addFlash('success', 'User '.$name.' was succesfully deleted');
 
         return $this->redirectToRoute('user_list');
+  }
+    /**
+     * @Route("/users/user/deleteGroup/{id}", name="deleteG")
+     * @Method({"DELETE"})
+     */
+    public function deleteGroup($id): Response{
+      $userGroup = $this->getDoctrine()->getRepository(UserGroup::Class)->find($id);
+      $user = $userGroup->getUser()->getId();
+      $entityManager = $this->getDoctrine()->getManager();
+      $entityManager->remove($userGroup);
+      $entityManager->flush();
+
+      $this->addFlash('success', 'Group was succesfully removed');
+
+        return $this->redirectToRoute('show_user', ['id' => $user]);
   } 
+
 }
 
 ?>
+
