@@ -1,7 +1,15 @@
 security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    encoders:
+        App\Entity\User:
+            algorithm: bcrypt
     providers:
         users_in_memory: { memory: null }
+        my_provider:
+            entity:
+                class: App\Entity\User
+                property: name
+
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -13,6 +21,10 @@ security:
             guard:
                 authenticators:
                     - App\Security\SecAuthAuthenticator
+            form_login:
+                login_path: login
+                check_path: login
+                provider: my_provider
             logout:
                 path: app_logout
                 # where to redirect after logout

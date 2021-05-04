@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Entity;
+//namespace Symfony\Component\Security\Core\Encoder;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
+//use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
+//use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -28,6 +32,11 @@ class User implements UserInterface, \Serializable
      */
     private $password;
 
+    /**
+     * @ORM\Column(type="string", length=64, unique=true)
+     */
+    private $email;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -41,6 +50,24 @@ class User implements UserInterface, \Serializable
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+    public function setPassword(string $password): self
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): self
+    {
+        $this->email = $email;
 
         return $this;
     }
@@ -99,10 +126,22 @@ class User implements UserInterface, \Serializable
         ) = unserialize($serialized, array('allowed_classes' => false));
     }
 
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
+    /**********************************************PASSWORD**************************************************/
+    public function encodePassword(UserInterface $user, string $plainPassword) {
 
-        return $this;
     }
+    /**
+     * @return bool true if the password is valid, false otherwise
+     */
+    public function isPasswordValid(UserInterface $user, string $raw) {
+
+    }
+
+    /**
+     * Checks if an encoded password would benefit from rehashing.
+     */
+    public function needsRehash(UserInterface $user): bool {
+
+    }
+
 }

@@ -10,10 +10,12 @@ use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 use App\Entity\UserGroup;
 use App\Entity\Group;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 
 class UserController extends AbstractController {
@@ -39,7 +41,7 @@ class UserController extends AbstractController {
      * @Route("/users/user/new", name="new_user")
      * Method({"GET", "POST"})
      */
-    public function newUser(Request $request) {
+    public function newUser(Request $request, UserPasswordEncoderInterface $encode) {
 
       $user = new User();
       $groups = $this->getDoctrine()->getRepository(Group::Class)->findAll();
@@ -47,11 +49,13 @@ class UserController extends AbstractController {
       $form = $this->createFormBuilder($user) 
       ->add('name', TextType::class, ['attr' =>['class' => 'form-control']])
       ->add('password', PasswordType::class, ['attr' =>['class' => 'form-control']])
+      ->add('email', EmailType::class, ['attr' =>['class' => 'form-control']])
       ->add('save', SubmitType::class, ['label' => 'Create', 'attr' =>['class' => 'btn btn-primary mt-3']])
       ->getForm();
       $form->handleRequest($request);
       if($form->isSubmitted() && $form->isValid()) {
-        $data = $form->getData();
+        $pass = $form->getData()->getPassword();
+        $user->setPassword($encode->encodePassword($user, $pass));
         $entityManager = $this->getDoctrine()->getManager();
         $group = $this->getDoctrine()->getRepository(Group::Class)->find($request->request->get('group_id'));
         if($group != null) {
