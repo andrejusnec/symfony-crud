@@ -4,10 +4,10 @@
 {{ form_start(form) }}
 
 {{ form_widget(form) }}
-<select class="form-control" name="group_id">
+<select class="form-control" id="exampleSelect2" name="groups[group][]" multiple>
   <option>Select group</option>
   {% for group in groups %}
-  <option value="{{ group.id }}">{{group.title}}</option>
+  <option  value="{{ group.id }}">{{group.title}}</option>
   {% endfor %}
    </select>
 {{ form_end(form) }}

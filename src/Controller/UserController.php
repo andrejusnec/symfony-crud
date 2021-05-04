@@ -53,10 +53,20 @@ class UserController extends AbstractController {
       if($form->isSubmitted() && $form->isValid()) {
         $data = $form->getData();
         $entityManager = $this->getDoctrine()->getManager();
-        $group = $this->getDoctrine()->getRepository(Group::Class)->find($request->request->get('group_id'));
-        if($group != null) {
+
+        //$group = $this->getDoctrine()->getRepository(Group::Class)->find($request->request->get('group_id'));
+        
+        $requestAll = $request->request->all();
+        $groupList = $requestAll['groups']['group'];
+        //dump($persons);
+        //die;
+        if($groupList != null) {
+          foreach ($groupList as $id) {
+          
+          $group = $this->getDoctrine()->getRepository(Group::Class)->find($id);
           $newLink = new userGroup($user, $group);
           $entityManager->persist($newLink);
+          }
         }
         $entityManager->persist($user);
         $entityManager->flush();
