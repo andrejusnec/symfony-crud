@@ -3,9 +3,10 @@
 ![Structure Type](https://img.shields.io/badge/Structure-Symfony-green)
 
 
-### Intern home Assignment
+### Intership home assignment
 
-This project is for educational porpuses only.
+Basic MVC project with a Symfony framewor. 
+Educational purposes only.
 
 
 
