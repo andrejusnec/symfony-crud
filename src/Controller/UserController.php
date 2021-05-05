@@ -89,7 +89,7 @@ class UserController extends AbstractController
      * @Route("/users/user/edit/{id}", name="edit_user")
      * Method({"GET", "POST"})
      */
-    public function edit(Request $request, $id)
+    public function edit(Request $request, int $id, UserPasswordEncoderInterface $passwordEncoder)
     {
 
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
@@ -100,7 +100,7 @@ class UserController extends AbstractController
 
         $form = $this->createFormBuilder($user)
             ->add('name', TextType::class, ['attr' => ['class' => 'form-control']])
-            ->add('password', PasswordType::class, ['attr' => ['class' => 'form-control'], 'required'   => false])
+        //->add('password', PasswordType::class, ['attr' => ['class' => 'form-control'], 'required'   => false])
         //->add('save', SubmitType::class, ['label' => 'Edit', 'attr' =>['class' => 'btn btn-primary mt-3']])
             ->getForm();
         $form->handleRequest($request);
@@ -108,7 +108,11 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
             $requestAll = $request->request->all();
+            if($requestAll['password'] != '' && isset($requestAll['password'])) {
 
+                $encoded = $passwordEncoder->encodePassword($user, $requestAll['password']);
+                $user->setPassword($encoded);
+            }
             if (isset($requestAll['groups']['group'])) {
                 $groupList = $requestAll['groups']['group'];
                 foreach ($groupList as $id) {
@@ -158,6 +162,7 @@ class UserController extends AbstractController
      */
     public function deleteGroup($id): Response
     {
+        if(isset($id)){
         $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
         $user = $userGroup->getUser()->getId();
         $entityManager = $this->getDoctrine()->getManager();
@@ -167,6 +172,10 @@ class UserController extends AbstractController
         $this->addFlash('success', 'Group was succesfully removed');
 
         return $this->redirectToRoute('edit_user', ['id' => $user]);
+        } else {
+            $this->addFlash('success', 'bla bla bla');
+            return $this->redirectToRoute('edit_user', ['id' => $user]);
+        }
     }
 
 }

@@ -20,6 +20,9 @@ class SecurityController extends AbstractController
 
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
+        if(isset($error)) {
+            $this->addFlash('error', 'Bad login');
+        }
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
@@ -27,7 +30,7 @@ class SecurityController extends AbstractController
     }
 
     /**
-     * @Route("/logout", name="app_logout")
+     * @Route("/logout", name="logout")
      */
     public function logout()
     {

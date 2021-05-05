@@ -78,7 +78,7 @@ class User implements UserInterface, \Serializable
 /******************************************************AUTH******************************************************* */
     public function getUsername()
     {
-        return $this->username;
+        return $this->name;
     }
 
     public function getSalt()

@@ -3,6 +3,7 @@
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
+
 <form method="post" action="{{ path('login') }}">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
@@ -16,9 +17,9 @@
 
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
     <label for="inputName">Name</label>
-    <input type="text" value="{{ last_username }}" name="name" id="inputName" class="form-control" required autofocus>
+    <input type="text" value="{{ last_username }}" name="_username" id="inputName" class="form-control" required autofocus>
     <label for="inputPassword">Password</label>
-    <input type="password" name="password" id="inputPassword" class="form-control">
+    <input type="password" name="_password" id="inputPassword" class="form-control" required>
 
     <input type="hidden" name="_csrf_token"
            value="{{ csrf_token('authenticate') }}"
