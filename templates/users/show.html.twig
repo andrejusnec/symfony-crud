@@ -8,8 +8,8 @@
 <table id="users" class="table table-striped">
       <thead>
         <tr>
-          <th>User</th>
-          <th>Actions</th>
+          <th>Groups</th>
+          <th>Info</th>
         </tr>
       </thead>
       <tbody>
@@ -18,7 +18,6 @@
             <td>{{li.grupe}}</td>
             <td>
             <a href="/groups/group/{{ li.grupe.id }}" class="btn btn-dark">Group Details</a>
-            <a href="/users/user/deleteGroup/{{li.id}}" class="btn btn-danger">Delete</a>
             </td>
           </tr>
         {% endfor %}

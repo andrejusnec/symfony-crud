@@ -105,4 +105,18 @@ class User implements UserInterface, \Serializable
 
         return $this;
     }
+
+    public static function notUserGroups(Array $groups, Array $groupList) {
+        $leftGroups = [];
+        foreach ($groups as $group) {
+            $groupID = $group->getId();
+            foreach($groupList as $one) {
+                if($one->getGrupe()->getId() == $groupID) {
+                  continue 2;
+                }
+            }
+            $leftGroups[] = $group;
+          }
+        return $leftGroups;
+    }
 }
