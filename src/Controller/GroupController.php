@@ -2,19 +2,15 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
-use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\Group;
 use App\Entity\User;
 use App\Entity\UserGroup;
-
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
 
 class GroupController extends AbstractController
 {
@@ -22,111 +18,137 @@ class GroupController extends AbstractController
      * @Route("/groups", name="group_list")
      * @Method({"GET"})
      */
-    public function index() {
+    public function index()
+    {
 
-        $groups = $this->getDoctrine()->getRepository(Group::Class)->findAll();
-        return $this->render('groups/index.html.twig',['groups' => $groups]);
-      }
+        $groups = $this->getDoctrine()->getRepository(Group::class)->findAll();
+        return $this->render('groups/index.html.twig', ['groups' => $groups]);
+    }
 
-      /**
+    /**
      * @Route("/groups/group/new", name="new_group")
      * Method({"GET", "POST"})
      */
-    public function newGroup(Request $request) {
+    public function newGroup(Request $request)
+    {
 
         $group = new Group();
-        $users = $this->getDoctrine()->getRepository(User::Class)->findAll();
+        $users = $this->getDoctrine()->getRepository(User::class)->findAll();
 
-        $form = $this->createFormBuilder($group) 
-        ->add('title', TextType::class, ['attr' =>['class' => 'form-control']])
-        ->add('save', SubmitType::class, ['label' => 'Create', 'attr' =>['class' => 'btn btn-primary mt-3']])
-        ->getForm();
+        $form = $this->createFormBuilder($group)
+            ->add('title', TextType::class, ['attr' => ['class' => 'form-control']])
+            ->getForm();
         $form->handleRequest($request);
-        if($form->isSubmitted() && $form->isValid()) {
-          $data = $form->getData();
-          $entityManager = $this->getDoctrine()->getManager();
-          $user = $this->getDoctrine()->getRepository(User::Class)->find($request->request->get('user_id'));
-        if($user != null) {
-          $newLink = new userGroup($user, $group);
-          $entityManager->persist($newLink);
-        }
-          $entityManager->persist($group);
-          $entityManager->flush();
-  
-          $this->addFlash('success', 'Group was succesfully created');
-  
-          return $this->redirectToRoute('group_list');
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $entityManager = $this->getDoctrine()->getManager();
+
+            //$user = $this->getDoctrine()->getRepository(User::Class)->find($request->request->get('user_id'));
+
+            $requestAll = $request->request->all();
+            if (isset($requestAll['users']['user'])) {
+
+                $userList = $requestAll['users']['user'];
+
+                foreach ($userList as $id) {
+
+                    $user = $this->getDoctrine()->getRepository(User::class)->find($id);
+                    $newLink = new userGroup($user, $group);
+                    $entityManager->persist($newLink);
+                }
+            }
+            $entityManager->persist($group);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Group was succesfully created');
+
+            return $this->redirectToRoute('group_list');
         }
         return $this->render('groups/create.html.twig', ['form' => $form->createView(), 'users' => $users]);
-      }
-  
-      /**
-       * @Route("/groups/group/edit/{id}", name="edit_group")
-       * Method({"GET", "POST"})
-       */
-      public function edit(Request $request, $id) {
+    }
 
-        $group = $this->getDoctrine()->getRepository(Group::Class)->find($id);
-        $users = $this->getDoctrine()->getRepository(User::Class)->findAll();
+    /**
+     * @Route("/groups/group/edit/{id}", name="edit_group")
+     * Method({"GET", "POST"})
+     */
+    public function edit(Request $request, $id)
+    {
 
-        $form = $this->createFormBuilder($group) 
-        ->add('title', TextType::class, ['attr' =>['class' => 'form-control']])
-        ->add('save', SubmitType::class, ['label' => 'Edit', 'attr' =>['class' => 'btn btn-primary mt-3']])
-        ->getForm();
+        $group = $this->getDoctrine()->getRepository(Group::class)->find($id);
+        $users = $this->getDoctrine()->getRepository(User::class)->findAll();
+        $userList = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['grupe' => $group]);
+
+        $usersNotInGroup = User::notUserGroups($users, $userList);
+
+        $form = $this->createFormBuilder($group)
+            ->add('title', TextType::class, ['attr' => ['class' => 'form-control']])
+            ->getForm();
         $form->handleRequest($request);
-        if($form->isSubmitted() && $form->isValid()) {
-          $entityManager = $this->getDoctrine()->getManager();
-        $user = $this->getDoctrine()->getRepository(User::Class)->find($request->request->get('user_id'));
-        if($group != null) {
-          $newLink = new userGroup($user, $group);
-          $entityManager->persist($newLink);
-        }
-          $entityManager->flush();
-  
-          $this->addFlash('success', 'Group was succesfully edited');
-  
-          return $this->redirectToRoute('group_list');
-        }
-        return $this->render('groups/edit.html.twig', ['form' => $form->createView(), 'users' => $users]);
-      }
 
-      /**
+        if ($form->isSubmitted() && $form->isValid()) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $requestAll = $request->request->all();
+
+            //$user = $this->getDoctrine()->getRepository(User::class)->find($request->request->get('user_id'));
+            if (isset($requestAll['users']['user'])) {
+                $userList = $requestAll['users']['user'];
+                foreach ($userList as $id) {
+                    $user = $this->getDoctrine()->getRepository(User::class)->find($id);
+                    $newLink = new userGroup($user, $group);
+                    $entityManager->persist($newLink);
+                }
+            }
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Group was succesfully edited');
+
+            return $this->redirectToRoute('group_list');
+        }
+        return $this->render('groups/edit.html.twig',
+         ['form' => $form->createView(), 'users' => $usersNotInGroup, 'list' => $userList]);
+    }
+
+    /**
      * @Route("/groups/group/{id}", name="show_group")
      */
-    public function show($id) {
-        $group = $this->getDoctrine()->getRepository(Group::Class)->find($id);
-        $userList = $this->getDoctrine()->getRepository(UserGroup::Class)->findBy(['grupe' => $group]);
-          return $this->render('groups/show.html.twig',['group' => $group, 'list' => $userList]);
-        }
-  
-      /**
-       * @Route("/groups/group/delete/{id}", name="delete_group")
-       * @Method({"DELETE"})
-       */
-      public function delete($id): Response{
-        $group = $this->getDoctrine()->getRepository(Group::Class)->find($id);
+    public function show($id)
+    {
+        $group = $this->getDoctrine()->getRepository(Group::class)->find($id);
+        $userList = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['grupe' => $group]);
+        return $this->render('groups/show.html.twig', ['group' => $group, 'list' => $userList]);
+    }
+
+    /**
+     * @Route("/groups/group/delete/{id}", name="delete_group")
+     * @Method({"DELETE"})
+     */
+    public function delete($id): Response
+    {
+        $group = $this->getDoctrine()->getRepository(Group::class)->find($id);
         $title = $group->getTitle();
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($group);
         $entityManager->flush();
-  
-        $this->addFlash('success', 'Group '.$title.' was succesfully deleted');
-  
-          return $this->redirectToRoute('group_list');
-    } 
+
+        $this->addFlash('success', 'Group ' . $title . ' was succesfully deleted');
+
+        return $this->redirectToRoute('group_list');
+    }
     /**
      * @Route("/groups/group/deleteUser/{id}", name="deleteU")
      * @Method({"DELETE"})
      */
-    public function deleteUser($id): Response{
-      $userGroup = $this->getDoctrine()->getRepository(UserGroup::Class)->find($id);
-      $group = $userGroup->getGrupe()->getId();
-      $entityManager = $this->getDoctrine()->getManager();
-      $entityManager->remove($userGroup);
-      $entityManager->flush();
+    public function deleteUser($id): Response
+    {
+        $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
+        $group = $userGroup->getGrupe()->getId();
+        $entityManager = $this->getDoctrine()->getManager();
+        $entityManager->remove($userGroup);
+        $entityManager->flush();
 
-      $this->addFlash('success', 'User was succesfully removed');
+        $this->addFlash('success', 'User was succesfully removed');
 
-        return $this->redirectToRoute('show_group', ['id' => $group]);
-  } 
+        return $this->redirectToRoute('edit_group', ['id' => $group]);
+    }
 }

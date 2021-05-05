@@ -4,11 +4,15 @@
 {{ form_start(form) }}
 
 {{ form_widget(form) }}
-<select class="form-control" name="group_id">
-  <option>Select group</option>
+<div style="margin:5px 0">
+<label style="margin-top:5px">Group List</label>
+<select class="form-control"  name="groups[group][]" multiple>
+  <option disabled selected>Select group</option>
   {% for group in groups %}
-  <option value="{{ group.id }}">{{group.title}}</option>
+  <option  value="{{ group.id }}">{{group.title}}</option>
   {% endfor %}
    </select>
+   </div>
+   <button type="submit" class="btn btn-secondary">Create</button>   
 {{ form_end(form) }}
 {% endblock %}

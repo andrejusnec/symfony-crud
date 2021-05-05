@@ -1,14 +1,38 @@
 {% extends 'base.html.twig' %}
 {% block title %}Edit Group information{% endblock %}
-{% block body %} 
+{% block body %}
+<h3>Edit Group information</h3>
 {{ form_start(form) }}
 
 {{ form_widget(form) }}
-<select class="form-control" name="user_id">
-  <option>Select user</option>
+<label>Available User List</label>
+<select class="form-control" name="users[user][]">
+  <option disabled selected>Select user...</option>
   {% for user in users %}
   <option value="{{ user.id }}">{{user.name}}</option>
   {% endfor %}
    </select>
+   <table id="groups" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Group members</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for li in list %}
+          <tr>
+            <td>{{li.user}}</td>
+            <td>
+            <a href="/groups/group/deleteUser/{{li.id}}" class="btn btn-danger">Remove</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div>
+    <a href="/groups/" class="btn btn-dark">Back</a>
+    <button type="submit" class="btn btn-secondary">Edit</button>
+    </div>
 {{ form_end(form) }}
 {% endblock %}
