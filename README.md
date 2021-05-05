@@ -5,8 +5,8 @@
 
 ### Intership home assignment
 
-Basic MVC project with a Symfony framewor. 
-Educational purposes only.
+Basic MVC project with a Symfony framework. 
+Educational purposes.
 
 
 
