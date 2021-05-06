@@ -6,9 +6,9 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-//use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+//use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+//use Doctrine\DBAL\Schema\Constraint;
 
-//use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -36,6 +36,17 @@ class User implements UserInterface, \Serializable
      * @ORM\Column(type="string", length=64, unique=true)
      */
     private $email;
+
+    /**
+     * @ORM\Column(type="array")
+     */
+    private $roles = [];
+
+    public function __construct()
+    {
+        //$this->roles = array('ROLE_USER');
+        $this->roles[] = 'ROLE_USER'; 
+    }
 
     public function getId(): ?int
     {
@@ -75,6 +86,12 @@ class User implements UserInterface, \Serializable
     {
         return $this->name;
     }
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
 /******************************************************AUTH******************************************************* */
     public function getUsername()
     {
@@ -95,7 +112,10 @@ class User implements UserInterface, \Serializable
 
     public function getRoles()
     {
-        return array('ROLE_USER');
+        //return array('ROLE_USER');
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
     }
 
     public function eraseCredentials()
@@ -156,5 +176,8 @@ class User implements UserInterface, \Serializable
             $leftGroups[] = $group;
           }
         return $leftGroups;
+    }
+    public static function hasRelationship($user) {
+        
     }
 }

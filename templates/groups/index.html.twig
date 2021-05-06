@@ -16,8 +16,10 @@
             <td>{{ group.title }}</td>
             <td> 
             <a href="/groups/group/{{ group.id }}" class="btn btn-dark">Show</a>
+            {% if is_granted('ROLE_ADMIN') %}
             <a href="/groups/group/edit/{{ group.id }}" class="btn btn-dark">Edit</a>
             <a href="/groups/group/delete/{{group.id}}" class="btn btn-danger">Delete</a>
+            {% endif %}
             </td>
           </tr>
         {% endfor %}

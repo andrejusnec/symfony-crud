@@ -18,8 +18,8 @@
     </head>
     <body>
     {{include('inc/navbar.html.twig')}}
-    {% for message in app.flashes('success') %}
-        <div style="text-align:center" class="alert alert-success">
+    {% for message in app.flashes('info') %}
+        <div style="text-align:center" class="alert alert-info">
         {{ message }}
         </div>
     {% endfor %}

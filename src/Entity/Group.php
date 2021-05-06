@@ -23,6 +23,11 @@ class Group
      */
     private $title;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $admin;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -42,5 +47,17 @@ class Group
     public function __toString(): string
     {
         return $this->title;
+    }
+
+    public function getAdmin(): ?bool
+    {
+        return $this->admin;
+    }
+
+    public function setAdmin(bool $admin): self
+    {
+        $this->admin = $admin;
+
+        return $this;
     }
 }

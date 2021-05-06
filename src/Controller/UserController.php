@@ -7,6 +7,7 @@ use App\Entity\UserGroup;
 
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
+
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -44,7 +45,7 @@ class UserController extends AbstractController
      * @Route("/users/user/new", name="new_user")
      * Method({"GET", "POST"})
      */
-    public function newUser(Request $request)
+    public function newUser(Request $request, UserPasswordEncoderInterface $passwordEncoder)
     {
 
         $user = new User();
@@ -53,15 +54,15 @@ class UserController extends AbstractController
         $form = $this->createFormBuilder($user)
             ->add('name', TextType::class, ['attr' => ['class' => 'form-control']])
             ->add('password', PasswordType::class, ['attr' => ['class' => 'form-control']])
-        //->add('save', SubmitType::class, ['label' => 'Create', 'attr' => ['class' => 'btn btn-primary mt-3']])
+            ->add('email', EmailType::class, ['label' => 'Email', 'attr' => ['class' => 'form-control']])
             ->getForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            $entityManager = $this->getDoctrine()->getManager();
+            $encoded = $passwordEncoder->encodePassword($user, $user->getPassword());
+            $user->setPassword($encoded);
 
-            //$group = $this->getDoctrine()->getRepository(Group::Class)->find($request->request->get('group_id'));
+            $entityManager = $this->getDoctrine()->getManager();
 
             $requestAll = $request->request->all();
             if(isset($requestAll['groups']['group'])) {
@@ -71,6 +72,11 @@ class UserController extends AbstractController
                 foreach ($groupList as $id) {
 
                     $group = $this->getDoctrine()->getRepository(Group::class)->find($id);
+                    if($group->getAdmin()) {
+                        $roles =$user -> getRoles();
+                        $roles[] = 'ROLE_ADMIN';
+                        $user->setRoles($roles);
+                    }
                     $newLink = new userGroup($user, $group);
                     $entityManager->persist($newLink);
                 }
@@ -78,7 +84,7 @@ class UserController extends AbstractController
             $entityManager->persist($user);
             $entityManager->flush();
 
-            $this->addFlash('success', 'User was succesfully created');
+            $this->addFlash('info', 'User was succesfully created');
 
             return $this->redirectToRoute('user_list');
         }
@@ -117,13 +123,18 @@ class UserController extends AbstractController
                 $groupList = $requestAll['groups']['group'];
                 foreach ($groupList as $id) {
                     $group = $this->getDoctrine()->getRepository(Group::class)->find($id);
+                    if($group->getAdmin()) {
+                        $roles =$user -> getRoles();
+                        $roles[] = 'ROLE_ADMIN';
+                        $user->setRoles($roles);
+                    }
                     $newLink = new userGroup($user, $group);
                     $entityManager->persist($newLink);
                 }
             }
             $entityManager->flush();
 
-            $this->addFlash('success', 'User was succesfully edited');
+            $this->addFlash('info', 'User was succesfully edited');
 
             return $this->redirectToRoute('user_list');
         }
@@ -144,17 +155,28 @@ class UserController extends AbstractController
      * @Route("/users/user/delete/{id}", name="delete_user")
      * @Method({"DELETE"})
      */
-    public function delete($id): Response
+    public function delete($id)
     {
+        if(!isset($id)) {
+            return $this->redirectToRoute('user_list');
+        }
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
         $name = $user->getName();
+        $hasRelationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['user' => $user]);
+        
+        if(count($hasRelationship) == 0 && isset($hasRelationship)){
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($user);
         $entityManager->flush();
 
-        $this->addFlash('success', 'User ' . $name . ' was succesfully deleted');
+        $this->addFlash('info', 'User ' . $name . ' was succesfully deleted');
 
         return $this->redirectToRoute('user_list');
+        } else {
+            $this->addFlash('info', 'User ' . $name . ' cannot be deleted - has a group.');
+
+            return $this->redirectToRoute('user_list');
+        }
     }
     /**
      * @Route("/users/user/deleteGroup/{id}", name="deleteG")
@@ -169,11 +191,11 @@ class UserController extends AbstractController
         $entityManager->remove($userGroup);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Group was succesfully removed');
+        $this->addFlash('info', 'Group was succesfully removed');
 
         return $this->redirectToRoute('edit_user', ['id' => $user]);
         } else {
-            $this->addFlash('success', 'bla bla bla');
+            $this->addFlash('info', 'bla bla bla');
             return $this->redirectToRoute('edit_user', ['id' => $user]);
         }
     }

@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Entity\UserGroup;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -37,6 +38,11 @@ class GroupController extends AbstractController
 
         $form = $this->createFormBuilder($group)
             ->add('title', TextType::class, ['attr' => ['class' => 'form-control']])
+            ->add('admin', ChoiceType::class, ['attr' => ['class' => 'form-control'],
+                'choices' => [
+                    'Yes' => true,
+                    'No' => false,
+                ]])
             ->getForm();
         $form->handleRequest($request);
 
@@ -61,7 +67,7 @@ class GroupController extends AbstractController
             $entityManager->persist($group);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Group was succesfully created');
+            $this->addFlash('info', 'Group was succesfully created');
 
             return $this->redirectToRoute('group_list');
         }
@@ -101,12 +107,12 @@ class GroupController extends AbstractController
             }
             $entityManager->flush();
 
-            $this->addFlash('success', 'Group was succesfully edited');
+            $this->addFlash('info', 'Group was succesfully edited');
 
             return $this->redirectToRoute('group_list');
         }
         return $this->render('groups/edit.html.twig',
-         ['form' => $form->createView(), 'users' => $usersNotInGroup, 'list' => $userList]);
+            ['form' => $form->createView(), 'users' => $usersNotInGroup, 'list' => $userList]);
     }
 
     /**
@@ -131,7 +137,7 @@ class GroupController extends AbstractController
         $entityManager->remove($group);
         $entityManager->flush();
 
-        $this->addFlash('success', 'Group ' . $title . ' was succesfully deleted');
+        $this->addFlash('info', 'Group ' . $title . ' was succesfully deleted');
 
         return $this->redirectToRoute('group_list');
     }
@@ -147,7 +153,7 @@ class GroupController extends AbstractController
         $entityManager->remove($userGroup);
         $entityManager->flush();
 
-        $this->addFlash('success', 'User was succesfully removed');
+        $this->addFlash('info', 'User was succesfully removed');
 
         return $this->redirectToRoute('edit_group', ['id' => $group]);
     }

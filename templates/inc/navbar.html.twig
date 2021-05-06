@@ -1,6 +1,6 @@
 <nav class="navbar navbar-expand-sm navbar-dark bg-secondary mb-3" style="background-color: #6c757d;">
 <div class="container">
-  <a href="/users/" class="navbar-brand">UMS</a>
+  <a href="/" class="navbar-brand">User Management System</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#mobile-nav">
     <span class="navbar-toggle-icon"></span>
   </button>
@@ -8,15 +8,14 @@
   <div class="collapse navbar-collapse" id="mobile-nav">
     <ul class="navbar-nav ml-auto">
       <li class="nav-item ms-1">
-        <a href="/" class="nav-link">Home</a>
-      </li>
-      <li class="nav-item ms-1">
       <div class="dropdown">
           <a class="btn btn-secondary dropdown-toggle border-0" 
           href="#" role="button"  data-bs-toggle="dropdown" aria-expanded="false">
           Users</a>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          {% if is_granted('ROLE_ADMIN') %}
             <li><a class="dropdown-item" href="/users/user/new" class="nav-link">New User</a></li>
+          {% endif %}
             <li><a class="dropdown-item" href="/users/" class="nav-link">User List</a></li>
           </ul>
       </div>
@@ -27,7 +26,9 @@
           href="#" role="button"  data-bs-toggle="dropdown" aria-expanded="false">
           Groups</a>
           <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          {% if is_granted('ROLE_ADMIN') %}
             <li><a class="dropdown-item" href="/groups/group/new" class="nav-link">New Group</a></li>
+          {% endif %}
             <li><a class="dropdown-item" href="/groups/" class="nav-link">Group List</a></li>
           </ul>
       </div>
