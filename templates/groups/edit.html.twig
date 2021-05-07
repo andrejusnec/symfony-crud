@@ -2,8 +2,8 @@
 {% block title %}Edit Group information{% endblock %}
 {% block body %}
 <h3>Edit Group information</h3>
+<div style="max-width:600px">
 {{ form_start(form) }}
-
 {{ form_widget(form) }}
 <label>Available User List</label>
 <select class="form-control" name="users[user][]" multiple>
@@ -35,11 +35,6 @@
     <button type="submit" class="btn btn-secondary">Edit</button>
     </div>
 {{ form_end(form) }}
+</div>
 <script>
-    window.addEventListener('DOMContentLoaded', (event) => {
-        $('.select2').select2({
-            width: 'resolve'
-        });
-    });
-</script>
 {% endblock %}

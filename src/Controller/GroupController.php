@@ -99,6 +99,11 @@ class GroupController extends AbstractController
                 $userList = $requestAll['users']['user'];
                 foreach ($userList as $id) {
                     $user = $this->getDoctrine()->getRepository(User::class)->find($id);
+                    if($group->getAdmin()) {
+                        $roles = $user->getRoles();
+                        $roles[] = 'ROLE_ADMIN';
+                        $user->setRoles($roles);
+                    }
                     $newLink = new userGroup($user, $group);
                     $entityManager->persist($newLink);
                 }
@@ -158,6 +163,10 @@ class GroupController extends AbstractController
     {
         $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
         $group = $userGroup->getGrupe()->getId();
+        if($userGroup->getGrupe()->getAdmin()) {
+            $relationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['grupe' => $group]);
+            User::adminGroupCheck($relationship, $userGroup);
+        }
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($userGroup);
         $entityManager->flush();
