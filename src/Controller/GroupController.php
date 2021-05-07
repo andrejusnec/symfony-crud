@@ -5,13 +5,11 @@ namespace App\Controller;
 use App\Entity\Group;
 use App\Entity\User;
 use App\Entity\UserGroup;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class GroupController extends AbstractController
@@ -50,7 +48,7 @@ class GroupController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
             $entityManager = $this->getDoctrine()->getManager();
-            
+
             $requestAll = $request->request->all();
             if (isset($requestAll['users']['user'])) {
 
@@ -95,12 +93,11 @@ class GroupController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
             $requestAll = $request->request->all();
 
-            //$user = $this->getDoctrine()->getRepository(User::class)->find($request->request->get('user_id'));
             if (isset($requestAll['users']['user'])) {
                 $userList = $requestAll['users']['user'];
                 foreach ($userList as $id) {
                     $user = $this->getDoctrine()->getRepository(User::class)->find($id);
-                    if($group->getAdmin()) {
+                    if ($group->getAdmin()) {
                         $roles = $user->getRoles();
                         $roles[] = 'ROLE_ADMIN';
                         $user->setRoles($roles);
@@ -135,21 +132,21 @@ class GroupController extends AbstractController
      */
     public function delete($id)
     {
-        if(!isset($id)) {
+        if (!isset($id)) {
             return $this->redirectToRoute('group_list');
         }
         $group = $this->getDoctrine()->getRepository(Group::class)->find($id);
         $title = $group->getTitle();
         $hasRelationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['grupe' => $group]);
 
-        if(count($hasRelationship) == 0 && isset($hasRelationship)){
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($group);
-        $entityManager->flush();
+        if (count($hasRelationship) == 0 && isset($hasRelationship)) {
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($group);
+            $entityManager->flush();
 
-        $this->addFlash('info', 'Group ' . $title . ' was succesfully deleted');
+            $this->addFlash('info', 'Group ' . $title . ' was succesfully deleted');
 
-        return $this->redirectToRoute('group_list');
+            return $this->redirectToRoute('group_list');
         } else {
             $this->addFlash('info', 'Group ' . $title . ' cannot be deleted - still have members');
 
@@ -160,22 +157,22 @@ class GroupController extends AbstractController
      * @Route("/groups/group/deleteUser/{id}", name="deleteU")
      * @Method({"DELETE"})
      */
-    public function deleteUser($id)//: Response
+    public function deleteUser($id) //: Response {
     {
-        $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
-        $user = $userGroup->getUser()->getId();
-        $group = $userGroup->getUser()->getId();
-        if($userGroup->getGrupe()->getAdmin()) {
-            $relationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['user' => $user]);
-            
-            User::adminGroupCheck($relationship, $userGroup);
-        }
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($userGroup);
-        $entityManager->flush();
+    $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
+    $user = $userGroup->getUser()->getId();
+    $group = $userGroup->getUser()->getId();
+    if ($userGroup->getGrupe()->getAdmin()) {
+        $relationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['user' => $user]);
 
-        $this->addFlash('info', 'User was succesfully removed');
-
-        return $this->redirectToRoute('edit_group', ['id' => $group]);
+        User::adminGroupCheck($relationship, $userGroup);
     }
+    $entityManager = $this->getDoctrine()->getManager();
+    $entityManager->remove($userGroup);
+    $entityManager->flush();
+
+    
+
+    return $this->redirectToRoute('group_list');
+}
 }

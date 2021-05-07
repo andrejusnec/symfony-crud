@@ -3,13 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Validator as UserAssert;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Regex;
-use Symfony\Component\Validator\Constraints\RegexValidator;
-
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
@@ -20,6 +20,7 @@ use Symfony\Component\Validator\Constraints\RegexValidator;
  * )
  */
 class User implements UserInterface, \Serializable
+
 {
     /**
      * @ORM\Id
@@ -31,23 +32,36 @@ class User implements UserInterface, \Serializable
     /**
      * @ORM\Column(type="string", length=64)
      * @Assert\NotBlank
-     * 
+     * @Assert\Length(
+     *      min = 2,
+     *      max = 50,
+     *      minMessage = "Your name must be at least {{ limit }} characters long",
+     *      maxMessage = "Your name cannot be longer than {{ limit }} characters"
+     * )
+     * @UserAssert\ContainsAlphabet
+     *
      */
     private $name;
-    
+
     /**
      * @ORM\Column(type="string", length=64)
      * @Assert\NotBlank
+     * @Assert\Length(
+     *      min = 3,
+     *      max = 200,
+     *      minMessage = "Your password must be at least {{ limit }} characters long",
+     *      maxMessage = "Your password cannot be longer than {{ limit }} characters"
+     * )
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=64)
-     * 
+     * @Assert\Regex("/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/")
      * @Assert\NotBlank
+     *
      */
     private $email;
-
     /**
      * @ORM\Column(type="array")
      */
@@ -55,8 +69,7 @@ class User implements UserInterface, \Serializable
 
     public function __construct()
     {
-        //$this->roles = array('ROLE_USER');
-        $this->roles[] = 'ROLE_USER'; 
+        $this->roles[] = 'ROLE_USER';
     }
 
     public function getId(): ?int
@@ -111,8 +124,6 @@ class User implements UserInterface, \Serializable
 
     public function getSalt()
     {
-        // you *may* need a real salt depending on your encoder
-        // see section on salt below
         return null;
     }
 
@@ -123,7 +134,6 @@ class User implements UserInterface, \Serializable
 
     public function getRoles()
     {
-        //return array('ROLE_USER');
         $roles = $this->roles;
         $roles[] = 'ROLE_USER';
         return array_unique($roles);
@@ -148,7 +158,7 @@ class User implements UserInterface, \Serializable
     /** @see \Serializable::unserialize() */
     public function unserialize($serialized)
     {
-        list (
+        list(
             $this->id,
             $this->name,
             $this->password,
@@ -158,54 +168,51 @@ class User implements UserInterface, \Serializable
     }
 
     /**********************************************PASSWORD**************************************************/
-    public function encodePassword(UserInterface $user, string $plainPassword) {
+    public function encodePassword(UserInterface $user, string $plainPassword)
+    {
 
     }
     /**
      * @return bool true if the password is valid, false otherwise
      */
-    public function isPasswordValid(UserInterface $user, string $raw) {
+    public function isPasswordValid(UserInterface $user, string $raw)
+    {
 
     }
 
     /**
      * Checks if an encoded password would benefit from rehashing.
      */
-    public function needsRehash(UserInterface $user): bool {
+    public function needsRehash(UserInterface $user): bool
+    {
 
     }
 
-    public static function notUserGroups(Array $groups, Array $groupList) {
+    public static function notUserGroups(array $groups, array $groupList)
+    {
         $leftGroups = [];
         foreach ($groups as $group) {
             $groupID = $group->getId();
-            foreach($groupList as $one) {
-                if($one->getGrupe()->getId() == $groupID) {
-                  continue 2;
+            foreach ($groupList as $one) {
+                if ($one->getGrupe()->getId() == $groupID) {
+                    continue 2;
                 }
             }
             $leftGroups[] = $group;
-          }
+        }
         return $leftGroups;
     }
 
-    public static function adminGroupCheck(array $relationship, UserGroup $userGroup) {
-            if (count($relationship) > 1 && isset($relationship)) {
-                $count = 0;
-                foreach ($relationship as $rel) {
-                    if ($rel->getGrupe()->getAdmin()) {
-                        $count++;
-                    }
+    public static function adminGroupCheck(array $relationship, UserGroup $userGroup)
+    {
+        if (count($relationship) > 1 && isset($relationship)) {
+            $count = 0;
+            foreach ($relationship as $rel) {
+                if ($rel->getGrupe()->getAdmin()) {
+                    $count++;
                 }
-                if ($count <= 1) {
-                    $useris = $userGroup->getUser();
-                    $roles = $useris->getRoles();
-                    if (($key = array_search('ROLE_ADMIN', $roles)) !== false) {
-                        unset($roles[$key]);
-                    }
-                    $useris->setRoles($roles);
-                }
-            } else {
+            }
+            if ($count <= 1) {
                 $useris = $userGroup->getUser();
                 $roles = $useris->getRoles();
                 if (($key = array_search('ROLE_ADMIN', $roles)) !== false) {
@@ -213,5 +220,13 @@ class User implements UserInterface, \Serializable
                 }
                 $useris->setRoles($roles);
             }
+        } else {
+            $useris = $userGroup->getUser();
+            $roles = $useris->getRoles();
+            if (($key = array_search('ROLE_ADMIN', $roles)) !== false) {
+                unset($roles[$key]);
+            }
+            $useris->setRoles($roles);
+        }
     }
 }

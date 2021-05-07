@@ -4,6 +4,9 @@ namespace App\Entity;
 
 use App\Repository\GroupRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\Regex;
 
 /**
  * @ORM\Entity(repositoryClass=GroupRepository::class)
@@ -20,6 +23,7 @@ class Group
 
     /**
      * @ORM\Column(type="string", length=150)
+     * @Assert\Regex("/^[\w ,.'-]+$/", message="Invalid characters")
      */
     private $title;
 
@@ -60,19 +64,19 @@ class Group
 
         return $this;
     }
-    public static function usersNotInGroup(Array $users, Array $userList) {
+    public static function usersNotInGroup(array $users, array $userList)
+    {
         $leftUsers = [];
         foreach ($users as $user) {
             $userID = $user->getId();
-            foreach($userList as $one) {
-                if($one->getuser()->getId() == $userID) {
-                  continue 2;
+            foreach ($userList as $one) {
+                if ($one->getuser()->getId() == $userID) {
+                    continue 2;
                 }
             }
             $leftUsers[] = $user;
-          }
+        }
         return $leftUsers;
     }
 
-    
 }

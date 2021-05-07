@@ -4,17 +4,16 @@ namespace App\Controller;
 use App\Entity\Group;
 use App\Entity\User;
 use App\Entity\UserGroup;
-
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends AbstractController
 {
@@ -168,7 +167,7 @@ class UserController extends AbstractController
                 $entityManager->remove($relationship);
             }
         }
-        if($id == $userId) {
+        if ($id == $userId) {
             $tokenStorage->setToken(null);
             $session->invalidate();
             $entityManager->remove($user);
@@ -187,7 +186,7 @@ class UserController extends AbstractController
      * @Method({"DELETE"})
      */
     public function deleteGroup($id)
-    { 
+    {
         if (isset($id)) {
             $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
             $user = $userGroup->getUser()->getId();
