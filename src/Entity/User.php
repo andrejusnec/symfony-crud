@@ -6,8 +6,9 @@ namespace App\Entity;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-//use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-//use Doctrine\DBAL\Schema\Constraint;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Regex;
+use Symfony\Component\Validator\Constraints\RegexValidator;
 
 
 /**
@@ -24,16 +25,20 @@ class User implements UserInterface, \Serializable
 
     /**
      * @ORM\Column(type="string", length=64)
+     * @Assert\NotBlank
+     * 
      */
     private $name;
-
+    
     /**
      * @ORM\Column(type="string", length=64)
+     * @Assert\NotBlank
      */
     private $password;
 
     /**
      * @ORM\Column(type="string", length=64, unique=true)
+     * @Assert\NotBlank
      */
     private $email;
 
@@ -177,7 +182,30 @@ class User implements UserInterface, \Serializable
           }
         return $leftGroups;
     }
-    public static function hasRelationship($user) {
-        
+
+    public static function adminGroupCheck(array $relationship, UserGroup $userGroup) {
+            if (count($relationship) > 1 && isset($relationship)) {
+                $count = 0;
+                foreach ($relationship as $rel) {
+                    if ($rel->getGrupe()->getAdmin()) {
+                        $count++;
+                    }
+                }
+                if ($count <= 1) {
+                    $useris = $userGroup->getUser();
+                    $roles = $useris->getRoles();
+                    if (($key = array_search('ROLE_ADMIN', $roles)) !== false) {
+                        unset($roles[$key]);
+                    }
+                    $useris->setRoles($roles);
+                }
+            } else {
+                $useris = $userGroup->getUser();
+                $roles = $useris->getRoles();
+                if (($key = array_search('ROLE_ADMIN', $roles)) !== false) {
+                    unset($roles[$key]);
+                }
+                $useris->setRoles($roles);
+            }
     }
 }

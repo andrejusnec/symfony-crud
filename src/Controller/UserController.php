@@ -4,20 +4,14 @@ namespace App\Controller;
 use App\Entity\Group;
 use App\Entity\User;
 use App\Entity\UserGroup;
-
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
-
-
-use Symfony\Component\Form\Extension\Core\Type\TextType;
-use Symfony\Component\Form\Extension\Core\Type\SubmitType;
-use Symfony\Component\Form\Extension\Core\Type\PasswordType;
-use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserController extends AbstractController
 {
@@ -65,15 +59,15 @@ class UserController extends AbstractController
             $entityManager = $this->getDoctrine()->getManager();
 
             $requestAll = $request->request->all();
-            if(isset($requestAll['groups']['group'])) {
+            if (isset($requestAll['groups']['group'])) {
 
-            $groupList = $requestAll['groups']['group'];
+                $groupList = $requestAll['groups']['group'];
 
                 foreach ($groupList as $id) {
 
                     $group = $this->getDoctrine()->getRepository(Group::class)->find($id);
-                    if($group->getAdmin()) {
-                        $roles =$user -> getRoles();
+                    if ($group->getAdmin()) {
+                        $roles = $user->getRoles();
                         $roles[] = 'ROLE_ADMIN';
                         $user->setRoles($roles);
                     }
@@ -106,15 +100,14 @@ class UserController extends AbstractController
 
         $form = $this->createFormBuilder($user)
             ->add('name', TextType::class, ['attr' => ['class' => 'form-control']])
-        //->add('password', PasswordType::class, ['attr' => ['class' => 'form-control'], 'required'   => false])
-        //->add('save', SubmitType::class, ['label' => 'Edit', 'attr' =>['class' => 'btn btn-primary mt-3']])
             ->getForm();
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
             $requestAll = $request->request->all();
-            if($requestAll['password'] != '' && isset($requestAll['password'])) {
+
+            if ($requestAll['password'] != '' && isset($requestAll['password'])) {
 
                 $encoded = $passwordEncoder->encodePassword($user, $requestAll['password']);
                 $user->setPassword($encoded);
@@ -123,8 +116,8 @@ class UserController extends AbstractController
                 $groupList = $requestAll['groups']['group'];
                 foreach ($groupList as $id) {
                     $group = $this->getDoctrine()->getRepository(Group::class)->find($id);
-                    if($group->getAdmin()) {
-                        $roles =$user -> getRoles();
+                    if ($group->getAdmin()) {
+                        $roles = $user->getRoles();
                         $roles[] = 'ROLE_ADMIN';
                         $user->setRoles($roles);
                     }
@@ -157,45 +150,49 @@ class UserController extends AbstractController
      */
     public function delete($id)
     {
-        if(!isset($id)) {
+        if (!isset($id)) {
             return $this->redirectToRoute('user_list');
         }
         $user = $this->getDoctrine()->getRepository(User::class)->find($id);
         $name = $user->getName();
-        $hasRelationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['user' => $user]);
-        
-        if(count($hasRelationship) == 0 && isset($hasRelationship)){
         $entityManager = $this->getDoctrine()->getManager();
+
+        $hasRelationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['user' => $user]);
+        if (count($hasRelationship) > 0) {
+            foreach ($hasRelationship as $relationship) {
+                $entityManager->remove($relationship);
+            }
+        }
         $entityManager->remove($user);
         $entityManager->flush();
 
         $this->addFlash('info', 'User ' . $name . ' was succesfully deleted');
 
         return $this->redirectToRoute('user_list');
-        } else {
-            $this->addFlash('info', 'User ' . $name . ' cannot be deleted - has a group.');
-
-            return $this->redirectToRoute('user_list');
-        }
     }
     /**
      * @Route("/users/user/deleteGroup/{id}", name="deleteG")
      * @Method({"DELETE"})
      */
-    public function deleteGroup($id): Response
-    {
-        if(isset($id)){
-        $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
-        $user = $userGroup->getUser()->getId();
-        $entityManager = $this->getDoctrine()->getManager();
-        $entityManager->remove($userGroup);
-        $entityManager->flush();
+    public function deleteGroup($id)
+    { //: Response {
+        if (isset($id)) {
+            $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
+            $user = $userGroup->getUser()->getId();
 
-        $this->addFlash('info', 'Group was succesfully removed');
+            $group = $userGroup->getGrupe();
+            if ($group->getAdmin()) {
+                $relationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['user' => $user]);
+                User::adminGroupCheck($relationship, $userGroup);
+            }
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->remove($userGroup);
+            $entityManager->flush();
 
-        return $this->redirectToRoute('edit_user', ['id' => $user]);
+            $this->addFlash('info', 'Group was succesfully removed');
+            return $this->redirectToRoute('edit_user', ['id' => $user]);
         } else {
-            $this->addFlash('info', 'bla bla bla');
+            $this->addFlash('info', 'Something went wrong...');
             return $this->redirectToRoute('edit_user', ['id' => $user]);
         }
     }

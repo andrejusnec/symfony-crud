@@ -6,12 +6,12 @@
 {{ form_widget(form) }}
 <div style="margin:5px 0">
 <label style="margin-top:5px">User List</label>
-<select class="form-control" name="users[user][]" multiple>
+{# <select class="form-control" name="users[user][]" multiple>
   <option disabled selected>Select user</option>
   {% for user in users %}
   <option value="{{ user.id }}">{{user.name}}</option>
   {% endfor %}
-   </select>
+   </select> #}
    </div>
    <button type="submit" class="btn btn-secondary">Create</button>
 {{ form_end(form) }}

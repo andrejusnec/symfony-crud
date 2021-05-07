@@ -2,8 +2,12 @@
 {% block title %}Group Information{% endblock %}
 {% block body %} 
 {% if group %}
-<h3> {{group.title}} </h3>
-
+<div class="card-body">
+  <label>Title: </label>
+    <h5 class="card-title">{{group.title}}</h5>
+  <label>Admin: </label>
+    <p class="card-text">{{group.admin}}</p>
+  </div>
 <br>
 <table id="groups" class="table table-striped">
       <thead>

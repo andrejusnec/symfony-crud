@@ -60,4 +60,17 @@ class Group
 
         return $this;
     }
+    public static function usersNotInGroup(Array $users, Array $userList) {
+        $leftUsers = [];
+        foreach ($users as $user) {
+            $userID = $user->getId();
+            foreach($userList as $one) {
+                if($one->getuser()->getId() == $userID) {
+                  continue 2;
+                }
+            }
+            $leftUsers[] = $user;
+          }
+        return $leftUsers;
+    }
 }

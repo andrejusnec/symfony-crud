@@ -6,8 +6,8 @@
 
 {{ form_widget(form) }}
 <label>Available User List</label>
-<select class="form-control" name="users[user][]">
-  <option disabled selected>Select user...</option>
+<select class="form-control" name="users[user][]" multiple>
+  <option selected disabled>Select user...</option>
   {% for user in users %}
   <option value="{{ user.id }}">{{user.name}}</option>
   {% endfor %}
@@ -35,4 +35,11 @@
     <button type="submit" class="btn btn-secondary">Edit</button>
     </div>
 {{ form_end(form) }}
+<script>
+    window.addEventListener('DOMContentLoaded', (event) => {
+        $('.select2').select2({
+            width: 'resolve'
+        });
+    });
+</script>
 {% endblock %}

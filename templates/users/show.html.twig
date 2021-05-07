@@ -2,8 +2,12 @@
 {% block title %}User Information{% endblock %}
 {% block body %} 
 {% if user %}
-<h3> {{user.name}} </h3>
-
+  <div class="card-body">
+  <label>Name: </label>
+    <h5 class="card-title">{{user.name}}</h5>
+  <label>Email: </label>
+    <p class="card-text">{{user.email}}</p>
+  </div>
 <br>
 <table id="users" class="table table-striped">
       <thead>

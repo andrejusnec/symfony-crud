@@ -40,8 +40,8 @@ class GroupController extends AbstractController
             ->add('title', TextType::class, ['attr' => ['class' => 'form-control']])
             ->add('admin', ChoiceType::class, ['attr' => ['class' => 'form-control'],
                 'choices' => [
-                    'Yes' => true,
                     'No' => false,
+                    'Yes' => true,
                 ]])
             ->getForm();
         $form->handleRequest($request);
@@ -49,9 +49,7 @@ class GroupController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
             $entityManager = $this->getDoctrine()->getManager();
-
-            //$user = $this->getDoctrine()->getRepository(User::Class)->find($request->request->get('user_id'));
-
+            
             $requestAll = $request->request->all();
             if (isset($requestAll['users']['user'])) {
 
@@ -71,7 +69,7 @@ class GroupController extends AbstractController
 
             return $this->redirectToRoute('group_list');
         }
-        return $this->render('groups/create.html.twig', ['form' => $form->createView(), 'users' => $users]);
+        return $this->render('groups/create.html.twig', ['form' => $form->createView()]);
     }
 
     /**
@@ -85,7 +83,7 @@ class GroupController extends AbstractController
         $users = $this->getDoctrine()->getRepository(User::class)->findAll();
         $userList = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['grupe' => $group]);
 
-        $usersNotInGroup = User::notUserGroups($users, $userList);
+        $usersNotInGroup = Group::usersNotInGroup($users, $userList);
 
         $form = $this->createFormBuilder($group)
             ->add('title', TextType::class, ['attr' => ['class' => 'form-control']])
@@ -131,8 +129,14 @@ class GroupController extends AbstractController
      */
     public function delete($id): Response
     {
+        if(!isset($id)) {
+            return $this->redirectToRoute('group_list');
+        }
         $group = $this->getDoctrine()->getRepository(Group::class)->find($id);
         $title = $group->getTitle();
+        $hasRelationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['grupe' => $group]);
+
+        if(count($hasRelationship) == 0 && isset($hasRelationship)){
         $entityManager = $this->getDoctrine()->getManager();
         $entityManager->remove($group);
         $entityManager->flush();
@@ -140,6 +144,11 @@ class GroupController extends AbstractController
         $this->addFlash('info', 'Group ' . $title . ' was succesfully deleted');
 
         return $this->redirectToRoute('group_list');
+        } else {
+            $this->addFlash('info', 'Group ' . $title . ' cannot be deleted - still have members');
+
+            return $this->redirectToRoute('group_list');
+        }
     }
     /**
      * @Route("/groups/group/deleteUser/{id}", name="deleteU")
