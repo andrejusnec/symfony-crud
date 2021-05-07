@@ -3,12 +3,12 @@
 ![Structure Type](https://img.shields.io/badge/Structure-Symfony-green)
 
 
-### Intership home assignment
+### Home assignment
 
 Basic MVC project with a Symfony framework. 
 Educational purposes.
 
-
+3rd party: Bootstrap
 
 
 ## Author
