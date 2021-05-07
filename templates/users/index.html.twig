@@ -18,7 +18,7 @@
             <a style="margin-top: 5px;" href="/users/user/{{ user.id }}" class="btn btn-dark">Show</a>
             {% if is_granted('ROLE_ADMIN') %}
             <a style="margin-top: 5px;" href="/users/user/edit/{{ user.id }}" class="btn btn-dark">Edit</a>
-            <a style="margin-top: 5px;" href="/users/user/delete/{{user.id}}" class="btn btn-danger">Delete</a>
+            <a style="margin-top: 5px;" href="/users/user/del/{{user.id}}" class="btn btn-danger">Delete</a>
             {% endif %}
             </td>
           </tr>

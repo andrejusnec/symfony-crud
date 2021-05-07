@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 {% block title %}Create new User{% endblock %}
 {% block body %} 
+<div style="max-width:600px">
 {{ form_start(form) }}
 
 {{ form_widget(form) }}
@@ -15,4 +16,5 @@
    </div>
    <button type="submit" class="btn btn-secondary">Create</button>   
 {{ form_end(form) }}
+</div>
 {% endblock %}

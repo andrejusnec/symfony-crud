@@ -11,7 +11,9 @@
             Users
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+          {% if is_granted('ROLE_ADMIN') %}
             <li><a class="dropdown-item" href="/users/user/new">New User</a></li>
+          {% endif %}
             <li><a class="dropdown-item" href="/users/">User List</a></li>
           </ul>
         </li>
@@ -20,14 +22,21 @@
             Groups
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          {% if is_granted('ROLE_ADMIN') %}
             <li><a class="dropdown-item" href="/groups/group/new">New Group</a></li>
+          {% endif %}
             <li><a class="dropdown-item" href="/groups/">Group List</a></li>
           </ul>
         </li>
       </ul>
       
       <div class="nav navbar-nav navbar-right">
-               <a href="{{ path('logout') }}" class="navbar-brand"><strong>Logout</strong></a>
+      {% if app.user %}
+    <a href="{{ path('logout') }}" class="navbar-brand"><strong>Logout</strong></a>
+      {% else %}
+    <a href="/login" class="navbar-brand"><strong>Log In</strong></a>
+      {% endif %}
+               
             </div>
       </div>
     </div>

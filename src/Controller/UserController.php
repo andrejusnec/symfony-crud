@@ -4,6 +4,7 @@ namespace App\Controller;
 use App\Entity\Group;
 use App\Entity\User;
 use App\Entity\UserGroup;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
@@ -12,6 +13,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class UserController extends AbstractController
 {
@@ -145,11 +148,13 @@ class UserController extends AbstractController
     }
 
     /**
-     * @Route("/users/user/delete/{id}", name="delete_user")
+     * @Route("/users/user/del/{id}", name="delete_user")
      * @Method({"DELETE"})
      */
-    public function delete($id)
+    public function del($id, TokenStorageInterface $tokenStorage, SessionInterface $session)
     {
+        $userId = $this->get('security.token_storage')->getToken()->getUser()->getId();
+
         if (!isset($id)) {
             return $this->redirectToRoute('user_list');
         }
@@ -163,6 +168,13 @@ class UserController extends AbstractController
                 $entityManager->remove($relationship);
             }
         }
+        if($id == $userId) {
+            $tokenStorage->setToken(null);
+            $session->invalidate();
+            $entityManager->remove($user);
+            $entityManager->flush();
+            return $this->redirectToRoute('login');
+        }
         $entityManager->remove($user);
         $entityManager->flush();
 
@@ -175,13 +187,12 @@ class UserController extends AbstractController
      * @Method({"DELETE"})
      */
     public function deleteGroup($id)
-    { //: Response {
+    { 
         if (isset($id)) {
             $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
             $user = $userGroup->getUser()->getId();
 
-            $group = $userGroup->getGrupe();
-            if ($group->getAdmin()) {
+            if ($userGroup->getGrupe()->getAdmin()) {
                 $relationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['user' => $user]);
                 User::adminGroupCheck($relationship, $userGroup);
             }
