@@ -31,7 +31,12 @@
       </ul>
       
       <div class="nav navbar-nav navbar-right">
-               <a href="{{ path('logout') }}" class="navbar-brand"><strong>Logout</strong></a>
+      {% if app.user %}
+    <a href="{{ path('logout') }}" class="navbar-brand"><strong>Logout</strong></a>
+      {% else %}
+    <a href="/login" class="navbar-brand"><strong>Log In</strong></a>
+      {% endif %}
+               
             </div>
       </div>
     </div>

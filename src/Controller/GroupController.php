@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Group;
 use App\Entity\User;
 use App\Entity\UserGroup;
+
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -132,7 +133,7 @@ class GroupController extends AbstractController
      * @Route("/groups/group/delete/{id}", name="delete_group")
      * @Method({"DELETE"})
      */
-    public function delete($id): Response
+    public function delete($id)
     {
         if(!isset($id)) {
             return $this->redirectToRoute('group_list');
@@ -159,12 +160,14 @@ class GroupController extends AbstractController
      * @Route("/groups/group/deleteUser/{id}", name="deleteU")
      * @Method({"DELETE"})
      */
-    public function deleteUser($id): Response
+    public function deleteUser($id)//: Response
     {
         $userGroup = $this->getDoctrine()->getRepository(UserGroup::class)->find($id);
-        $group = $userGroup->getGrupe()->getId();
+        $user = $userGroup->getUser()->getId();
+        $group = $userGroup->getUser()->getId();
         if($userGroup->getGrupe()->getAdmin()) {
-            $relationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['grupe' => $group]);
+            $relationship = $this->getDoctrine()->getRepository(UserGroup::class)->findBy(['user' => $user]);
+            
             User::adminGroupCheck($relationship, $userGroup);
         }
         $entityManager = $this->getDoctrine()->getManager();

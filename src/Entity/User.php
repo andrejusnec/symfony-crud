@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Entity;
-//namespace Symfony\Component\Security\Core\Encoder;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,6 +13,11 @@ use Symfony\Component\Validator\Constraints\RegexValidator;
 
 /**
  * @ORM\Entity(repositoryClass=UserRepository::class)
+ *  @UniqueEntity(
+ *    fields={"email"},
+ *    errorPath="email",
+ *    message="This email is already taken."
+ * )
  */
 class User implements UserInterface, \Serializable
 {
@@ -38,7 +42,8 @@ class User implements UserInterface, \Serializable
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=64, unique=true)
+     * @ORM\Column(type="string", length=64)
+     * 
      * @Assert\NotBlank
      */
     private $email;

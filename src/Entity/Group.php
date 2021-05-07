@@ -73,4 +73,6 @@ class Group
           }
         return $leftUsers;
     }
+
+    
 }

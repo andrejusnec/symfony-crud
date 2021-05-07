@@ -3,17 +3,12 @@
 {% block title %}Log in!{% endblock %}
 
 {% block body %}
-
+<div style="max-width:400px; margin: auto">
 <form method="post" action="{{ path('login') }}">
     {% if error %}
         <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
     {% endif %}
 
-    {% if app.user %}
-        <div class="mb-3">
-            You are logged in as {{ app.user.username }}, <a href="{{ path('app_logout') }}">Logout</a>
-        </div>
-    {% endif %}
 
     <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
     <label for="inputName">Name</label>
@@ -40,4 +35,10 @@
         Sign in
     </button>
 </form>
+{% if app.user %}
+        <div class="mb-3">
+            <strong>You are logged in as {{ app.user.username }}, <a href="{{ path('logout') }}">Logout</a> </strong>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

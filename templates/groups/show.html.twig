@@ -5,8 +5,6 @@
 <div class="card-body">
   <label>Title: </label>
     <h5 class="card-title">{{group.title}}</h5>
-  <label>Admin: </label>
-    <p class="card-text">{{group.admin}}</p>
   </div>
 <br>
 <table id="groups" class="table table-striped">
@@ -30,5 +28,5 @@
 {% else %}
 <p>Something went wrong</p>
 {% endif %}
-<a href="/groups/" class="btn btn-primary">Back</a>
+<a href="/groups/" class="btn btn-secondary">Back</a>
 {% endblock %}

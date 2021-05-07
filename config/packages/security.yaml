@@ -40,16 +40,16 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/login, roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_ADMIN] }
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/login, roles: [IS_AUTHENTICATED_ANONYMOUSLY, ROLE_ADMIN, ROLE_USER] }
         - { path: ^/users/user/new, roles: ROLE_ADMIN }
         - { path: ^/groups/group/new, roles: ROLE_ADMIN }
         - { path: ^/groups/group/deleteUser/, roles: ROLE_ADMIN }
         - { path: ^/groups/group/delete/, roles: ROLE_ADMIN }
         - { path: ^/groups/group/edit/, roles: ROLE_ADMIN }
         - { path: ^/users/user/deleteGroup/, roles: ROLE_ADMIN }
-        - { path: ^/users/user/delete/, roles: ROLE_ADMIN }
+        - { path: ^/users/user/del/, roles: ROLE_ADMIN }
         - { path: ^/users/user/edit/, roles: ROLE_ADMIN }
         - { path: ^/logout, roles: [ROLE_USER, ROLE_ADMIN] }
-        # - { path: ^/, roles: [ROLE_ADMIN, ROLE_USER] }
+        - { path: ^/, roles: [ROLE_ADMIN, ROLE_USER] }
           
